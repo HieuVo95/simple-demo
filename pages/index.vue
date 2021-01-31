@@ -1,73 +1,100 @@
 <template>
-  <div class="container">
+  <div>
     <div>
-      <Logo />
-      <h1 class="title">
-        simple-demo
-      </h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
+      <h1>Overview</h1>
+      <div class="content-body">
+        <div class="group-header">
+          <h3>Total {{ listItem.length }}</h3>
+          <div>
+            <b-button
+              variant="outline-success"
+              @click="isOpenAddListPopup = true"
+              >Add new list</b-button
+            >
+          </div>
+        </div>
+        <div class="list-card">
+          <b-row>
+            <b-col
+              cols="12"
+              md="6"
+              sm="12"
+              xl="3"
+              lg="4"
+              v-for="item in listItem"
+              :key="item.id"
+            >
+              <CardInfoList :item="item" @remove="remove"></CardInfoList>
+            </b-col>
+          </b-row>
+        </div>
       </div>
     </div>
+    <PopupAddList
+      v-if="isOpenAddListPopup"
+      @hide="isOpenAddListPopup = false"
+    ></PopupAddList>
+    <PopupMessage
+      v-if="isOpenMessage"
+      title="Success"
+      message="Delete success"
+      is-show-ok-button
+      @hide="isOpenMessage = false"
+    ></PopupMessage>
   </div>
 </template>
 
 <script>
-export default {}
+import { mapActions } from "vuex";
+import PopupAddList from "@/components/PopupEditInfoList";
+import PopupMessage from "@/components/PopupMessage";
+import CardInfoList from "@/components/CardInfoList";
+export default {
+  components: {
+    PopupAddList,
+    PopupMessage,
+    CardInfoList
+  },
+  data() {
+    return {
+      listItem: [],
+      isOpenAddListPopup: false,
+      isOpenMessage: false
+    };
+  },
+  computed: {
+    listManager() {
+      return this.$store.state.listManager;
+    }
+  },
+  mounted() {
+    this.getAllList();
+  },
+  methods: {
+    ...mapActions(['removeListById']),
+    getAllList() {
+      if (this.listManager) {
+      this.listItem = this.listManager;
+    }
+    },
+    remove(id) {
+      this.removeListById({id: id});
+      this.$nextTick(() => {
+        this.isOpenMessage = true;
+        this.getAllList();
+      })
+    }
+  }
+};
 </script>
 
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
+<style lang="scss" scoped>
+.group-header {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  flex-direction: row;
+  justify-content: space-between;
 }
-
-.title {
-  font-family:
-    'Quicksand',
-    'Source Sans Pro',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+.list-card {
+  margin-top: 1rem;
 }
 </style>
