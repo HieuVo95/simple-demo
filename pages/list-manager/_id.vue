@@ -12,6 +12,14 @@
         >Add new item</b-button
       >
     </div>
+    <b-form-group
+        id="input-group-img"
+        label="Image"
+    >
+        <b-img :src="item.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" @click="onChosseFile"></b-img >
+        <input type="file" class="d-none" id="fileInput" ref="fileInput" accept="image/*" @change="uploadFile">
+        
+    </b-form-group>
     <div class="table-content">
       <b-table-simple bordered show-empty responsive>
         <b-thead head-variant="dark">
@@ -23,10 +31,14 @@
         </b-thead>
         <b-tbody v-if="item.list.length > 0">
           <b-tr v-for="(detailItem, index) in item.list" :key="detailItem.id">
-            <b-td>{{ index + 1 }}</b-td>
-            <b-td>{{ detailItem.name }}</b-td>
-            <b-td>{{ detailItem.description }}</b-td>
-            <b-td class="group-btn">
+            <b-td style="width: 5%">{{ index + 1 }}</b-td>
+            <b-td style="width: 15%">
+                <b-img :src="detailItem.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image"></b-img>
+            </b-td>
+            <b-td style="width: 10%">{{ detailItem.name }}</b-td>
+            <b-td style="width: 35%">{{ detailItem.description }}</b-td>
+            <b-td style="width: 10%">{{ detailItem.listCate.toString() }}</b-td>
+            <b-td class="group-btn" style="width: 15%">
               <b-button variant="warning" @click="editItem(detailItem)">Edit</b-button>
               <b-button variant="danger" @click="itemEdit = detailItem; isOpenMessage = true">Remove</b-button>
             </b-td>
@@ -34,12 +46,12 @@
         </b-tbody>
         <b-tbody v-else>
           <b-tr>
-            <b-td colspan="4" class="text-center">No data</b-td>
+            <b-td colspan="6" class="text-center">No data</b-td>
           </b-tr>
         </b-tbody>
         <b-tfoot>
           <b-tr>
-            <b-td colspan="4" variant="secondary" class="text-right">
+            <b-td colspan="6" variant="secondary" class="text-right">
               Total Items: <b>{{ item.list.length }}</b>
             </b-td>
           </b-tr>
@@ -72,6 +84,13 @@
       is-show-ok-button
       @hide="isOpenMessage = false"
     ></PopupMessage>
+    <PopupCropperImg
+        id="UploadCropperImage"
+        ref="UploadCropperImage"
+        type-upload="avatar"
+        @avatarUpload="handleImgCropper"
+        @close="handleCloseUpload"
+    />
   </div>
 </template>
 
@@ -93,7 +112,7 @@ export default {
           to: "/"
         }
       ],
-      fields: ["Num.", "Name", "Description", "Action"],
+      fields: ["Num.", "Image", "Name", "Description", "Categories", "Action"],
       isOpenEdit: false,
       isEdit: false,
       itemEdit: {},
@@ -113,7 +132,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["getListById", "removeItemById"]),
+    ...mapActions(["getListById", "removeItemById", "updateImgList"]),
     async getList() {
       const result = await this.getListById({ id: this.$route.params.id });
       if (result) {
@@ -134,7 +153,35 @@ export default {
             this.isOpenMessageSuccess = true;
             this.getList();
         });
-    }
+    },
+    onChosseFile() {
+            this.$refs.fileInput.click();
+    },
+    uploadFile(event) {
+        const i = event.target;
+        if(i.files && i.files[0]) {
+            this.$nextTick(()=>{
+                this.$refs.UploadCropperImage.show(i.files[0]);
+            });
+        }
+    },
+    handleImgCropper(canvas) {
+        if(canvas) {
+            canvas.toBlob(blob=>{
+                const reader = new FileReader();
+                    reader.onload = (e)=>{
+                        this.updateImgList({id: this.item.id, image: e.target.result});
+                        // this.item.image = e.target.result;
+                    };
+                    reader.readAsDataURL(blob);
+                    document.getElementById('fileInput').value = '';
+            });
+        }
+    },
+    handleCloseUpload(typeUpload) {
+        if(typeUpload === 'avatar')
+            document.getElementById('fileInput').value = '';
+    },
   }
 };
 </script>

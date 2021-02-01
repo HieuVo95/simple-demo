@@ -63,6 +63,7 @@ input.is-invalid {
 }
 ::-webkit-scrollbar {
   width: 3px;
+  height: 3px;
   background-color: #ffffff;
 }
 
@@ -70,4 +71,8 @@ input.is-invalid {
   background-color: #9999997a;
   border-radius: 10px;
   border: 1px solid #9999997a;
+}
+
+.vue-advanced-cropper__background {
+  background-color: #fff !important;
 }

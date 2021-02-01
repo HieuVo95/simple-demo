@@ -7,7 +7,44 @@ export const state = () => ({
             list: []
         }
     ],
-    id: 1
+    id: 1,
+    listCategory: [
+        {
+            id: '1',
+            text: 'Electronics',
+            value: 'Electronics'
+        },
+        {
+            id: '2',
+            text: 'Computers',
+            value: 'Computers'
+        },
+        {
+            id: '3',
+            text: 'Automotive',
+            value: 'Automotive'
+        },
+        {
+            id: '4',
+            text: 'Baby',
+            value: 'Baby'
+        },
+        {
+            id: '5',
+            text: 'Beauty and personal care',
+            value: 'Beauty and personal care'
+        },
+        {
+            id: '6',
+            text: 'Kichen',
+            value: 'Kichen'
+        },
+        {
+            id: '7',
+            text: 'Pet',
+            value: 'Pet'
+        },
+    ]
 });
 
 export const getters = {
@@ -18,7 +55,7 @@ export const mutations = {
     addListManager(state, options) {
         if (options.name) {
             if (!state.listManager.some(o => o.name === options.name)) {
-                state.listManager.push({id: ++state.id,name: options.name, list: []});
+                state.listManager.push({id: ++state.id,name: options.name, list: [], image: null, listCate: []});
             }
         }
     },
@@ -55,6 +92,12 @@ export const mutations = {
             }
         });
     },
+    updateImgList(state, options) {
+        state.listManager.map(o => {
+            if (Number(o.id) === Number(options.id))
+                o.image = options.image;
+        })
+    }
 };
 
 export const actions = {
@@ -87,9 +130,14 @@ export const actions = {
             options = {};
         commit('editItem', options);
     },
-    removeItemById({commit, state}, options) {
+    removeItemById({commit}, options) {
         if (options.idList) {
             commit('removeItemById', options);
         }
     },
+    updateImgList({commit}, options) {
+        if (!options)
+            options = {};
+        commit('updateImgList', options);
+    }
 };

@@ -68,6 +68,22 @@
                                 </b-form-group>
                                 <div v-show="v.failedRules.required" class="text-error">Description cannot be empty.</div>
                             </ValidationProvider>
+                            <b-form-group
+                                id="input-group-3"
+                                label="Image"
+                            >
+                                <b-img :src="form.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" @click="onChosseFile"></b-img >
+                                <input type="file" class="d-none" id="fileInput" ref="fileInput" accept="image/*" @change="uploadFile">
+                            </b-form-group>
+                            <b-form-group
+                                id="input-group-4"
+                                label="Category"
+                            >
+                                <div class="list-categoty">
+                                    <b-badge v-for="cate in form.listCate" :key="cate">{{ cate }}</b-badge>
+                                </div>
+                                <b-button @click="isOpenSelectCate = true" variant="success">Edit</b-button>
+                            </b-form-group>
                         </b-form>
                     </ValidationObserver>
                 </div>
@@ -76,11 +92,21 @@
                 </div>
             </div>
         </div>
+        <PopupCropperImg
+            id="UploadCropperImage"
+            ref="UploadCropperImage"
+            type-upload="avatar"
+            @avatarUpload="handleImgCropper"
+            @close="handleCloseUpload"
+        />
+        <PopupSelectCategory v-if="isOpenSelectCate" :list-cate-data="form.listCate" @submit="handleSelectCate" @hide="isOpenSelectCate = false"></PopupSelectCategory>
     </div>
 </template>
 
 <script>
-import {mapActions} from "vuex"
+import {mapActions} from "vuex";
+import PopupCropperImg from "@/components/PopupCropperImg";
+import PopupSelectCategory from "@/components/PopupSelectCategory";
 export default {
     props: {
         id: {
@@ -104,6 +130,10 @@ export default {
             default: true
         }
     },
+    components: {
+        PopupCropperImg,
+        PopupSelectCategory
+    },
     data() {
         return {
             name: null,
@@ -112,8 +142,10 @@ export default {
                 id: null,
                 name: null,
                 description: null,
-                image: null
-            }
+                image: null,
+                listCate: []
+            },
+            isOpenSelectCate: false
         };
     },
     computed: {
@@ -163,23 +195,36 @@ export default {
                 });
             }
         },
-        // checkList() {
-        //     if (this.name) {
-        //         let err = this.listData.some(o => {
-        //             return o.name.toLowerCase() === this.name.toLowerCase();
-        //         });
-        //         return err;
-        //     }
-        // },
-        // async addList() {
-        //     const validate = await this.$refs.validateName.validate();
-        //     if (!validate.valid)
-        //         return;
-        //     this.addNewList({name: this.name});
-        //     this.$nextTick(() => {
-        //         this.hide();
-        //     });
-        // }
+        onChosseFile() {
+            this.$refs.fileInput.click();
+        },
+        uploadFile(event) {
+            const i = event.target;
+            if(i.files && i.files[0]) {
+                this.$nextTick(()=>{
+                    this.$refs.UploadCropperImage.show(i.files[0]);
+                });
+            }
+        },
+        handleImgCropper(canvas) {
+            if(canvas) {
+                canvas.toBlob(blob=>{
+                    const reader = new FileReader();
+                        reader.onload = (e)=>{
+                            this.form.image = e.target.result;
+                        };
+                        reader.readAsDataURL(blob);
+                        document.getElementById('fileInput').value = '';
+                });
+            }
+        },
+        handleCloseUpload(typeUpload) {
+            if(typeUpload === 'avatar')
+                document.getElementById('fileInput').value = '';
+        },
+        handleSelectCate(list) {
+            this.form.listCate = list;
+        }
     }
 };
 </script>
@@ -189,7 +234,7 @@ export default {
     .modal-dialog {
         .modal-content {
             margin: auto;
-            height: 100%;
+            max-height: 600px;
             padding: 40px;
             padding-bottom: 20px;
         }
@@ -208,10 +253,9 @@ export default {
                 text-decoration: underline;
             }
         }
-        .input-name {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .form-content {
+            overflow: auto;
+            max-height: 300px;
             input {
                 width: 100%;
                 height: 3rem;
@@ -223,17 +267,14 @@ export default {
                     border: 2px solid green;
                 }
             }
-        }
-        .form-content {
-            input {
-                width: 100%;
-                height: 3rem;
-                border: 1px solid #d2d2d2;
-                font-size: 1rem;
-                outline: none;
-                padding: 1rem;
-                &:focus {
-                    border: 2px solid green;
+            .list-categoty {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                .badge {
+                    margin: 0 0.5rem 0.5rem 0;
+                    padding: 15px;
+                    font-size: 1rem;
                 }
             }
         }
