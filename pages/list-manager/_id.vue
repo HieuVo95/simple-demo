@@ -16,7 +16,7 @@
         id="input-group-img"
         label="Image"
     >
-        <b-img :src="item.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" @click="onChosseFile"></b-img >
+        <b-img :src="item.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" @click="onChosseFile" style="cursor: pointer;"></b-img >
         <input type="file" class="d-none" id="fileInput" ref="fileInput" accept="image/*" @change="uploadFile">
         
     </b-form-group>
@@ -33,7 +33,7 @@
           <b-tr v-for="(detailItem, index) in item.list" :key="detailItem.id">
             <b-td style="width: 5%">{{ index + 1 }}</b-td>
             <b-td style="width: 15%">
-                <b-img :src="detailItem.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image"></b-img>
+                <b-img :src="detailItem.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" style="cursor: pointer;"></b-img>
             </b-td>
             <b-td style="width: 10%">{{ detailItem.name }}</b-td>
             <b-td style="width: 35%">{{ detailItem.description }}</b-td>

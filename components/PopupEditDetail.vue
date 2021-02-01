@@ -72,7 +72,7 @@
                                 id="input-group-3"
                                 label="Image"
                             >
-                                <b-img :src="form.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" @click="onChosseFile"></b-img >
+                                <b-img :src="form.image || '/images/default-img.jpg'" width="200px" height="200px" fluid alt="Responsive image" style="cursor: pointer;" @click="onChosseFile"></b-img >
                                 <input type="file" class="d-none" id="fileInput" ref="fileInput" accept="image/*" @change="uploadFile">
                             </b-form-group>
                             <b-form-group

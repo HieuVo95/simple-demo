@@ -7,7 +7,7 @@
       bg-variant="dark"
       text-variant="light"
       width="180px"
-      backdrop-variant="transparent"
+      backdrop-variant="dark"
       backdrop
       no-header
     >
